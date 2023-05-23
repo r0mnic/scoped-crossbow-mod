@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.r0mnic.ScopedCrossbowMod.ScopedCrossbowMod"
+      "net.r0mnic.ScopedCrossbowMod.ScopedCrossbowItem"
     ],
     "client": [
       "net.r0mnic.ScopedCrossbowMod.ScopedCrossbowClient"
