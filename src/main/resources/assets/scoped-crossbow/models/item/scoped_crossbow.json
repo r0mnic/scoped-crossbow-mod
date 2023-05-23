@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+    "textures": {
+      "layer0": "scoped-crossbow:item/scoped_crossbow_uncharged"
+    }
+}
