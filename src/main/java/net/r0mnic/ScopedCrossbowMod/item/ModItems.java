@@ -8,19 +8,20 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.r0mnic.ScopedCrossbowMod.ScopedCrossbowItem;
+import net.r0mnic.ScopedCrossbowMod.ScopedCrossbowMod;
+import net.r0mnic.ScopedCrossbowMod.item.custom.ScopedCrossbowItem;
 
 public class ModItems {
 
-    public static final Item SCOPED_CROSSBOW = registerItem("scoped_crossbow", new Item(new FabricItemSettings()));
+    public static final Item SCOPED_CROSSBOW = registerItem("scoped_crossbow", new ScopedCrossbowItem(new FabricItemSettings()));
 
     public static void registerModItems() {
-        ScopedCrossbowItem.LOGGER.info("Registering mod items...");
+        ScopedCrossbowMod.LOGGER.info("Registering mod items...");
         addItemsToItemGroup();
     }
 
     private static Item registerItem(String name, Item item) {
-        return Registry.register(Registries.ITEM, new Identifier(ScopedCrossbowItem.MOD_ID, name), item);
+        return Registry.register(Registries.ITEM, new Identifier(ScopedCrossbowMod.MOD_ID, name), item);
     }
 
     public static void addItemsToItemGroup() {
