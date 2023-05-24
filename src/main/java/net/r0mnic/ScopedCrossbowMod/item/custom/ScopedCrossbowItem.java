@@ -1,13 +1,20 @@
 package net.r0mnic.ScopedCrossbowMod.item.custom;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.CrossbowUser;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -33,6 +40,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -48,18 +57,36 @@ public class ScopedCrossbowItem extends RangedWeaponItem implements Vanishable {
     }
 
     private boolean isScoped = false;
+    private static final double ZOOM_FOV = 0.05; // Adjust this value to control the zoom level
 
-    @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         if (!isScoped && entity instanceof PlayerEntity player && entity.isSneaking() && stack.getItem() == this && ((PlayerEntity) entity).getMainHandStack() == stack) {
             new ItemStack(Items.SPYGLASS);
             Items.SPYGLASS.use(world, player, Hand.MAIN_HAND);
             isScoped = true;
-        } else if (isScoped && entity instanceof PlayerEntity && !entity.isSneaking()) {
+
+            if (world.isClient) {
+                EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+                if (attribute != null) {
+                    double baseFOV = attribute.getBaseValue();
+                    attribute.setBaseValue(baseFOV * ZOOM_FOV);
+                }
+            }
+        } else if (isScoped && entity instanceof PlayerEntity player && !entity.isSneaking()) {
             isScoped = false;
-            Items.SPYGLASS.finishUsing(new ItemStack(Items.SPYGLASS), world, (PlayerEntity) entity);
+            Items.SPYGLASS.finishUsing(new ItemStack(Items.SPYGLASS), world, player);
+
+            if (world.isClient) {
+                EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+                if (attribute != null) {
+                    double baseFOV = attribute.getBaseValue();
+                    attribute.setBaseValue(baseFOV / ZOOM_FOV);
+                }
+            }
         }
     }
+
+
     @Override
     public Predicate<ItemStack> getHeldProjectiles() {
         return CROSSBOW_HELD_PROJECTILES;
